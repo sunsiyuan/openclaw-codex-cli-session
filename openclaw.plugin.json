@@ -1,0 +1,63 @@
+{
+  "id": "codex-cli-session",
+  "name": "Codex CLI Session Backend",
+  "description": "ACP runtime backend that routes OpenClaw ACP session turns to local Codex CLI.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "command": {
+        "type": "string",
+        "default": "codex"
+      },
+      "cwd": {
+        "type": "string"
+      },
+      "model": {
+        "type": "string"
+      },
+      "sandbox": {
+        "type": "string",
+        "enum": ["read-only", "workspace-write", "danger-full-access"]
+      },
+      "extraArgs": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "cancelGraceMs": {
+        "type": "number",
+        "minimum": 100,
+        "maximum": 60000
+      }
+    }
+  },
+  "uiHints": {
+    "command": {
+      "label": "Codex command",
+      "help": "Path or command name for Codex CLI (default: codex)."
+    },
+    "cwd": {
+      "label": "Default CWD",
+      "help": "Fallback working directory for ACP sessions when session cwd is not provided."
+    },
+    "model": {
+      "label": "Model override",
+      "help": "Optional codex --model value."
+    },
+    "sandbox": {
+      "label": "Sandbox mode",
+      "help": "Optional codex --sandbox mode for exec turns."
+    },
+    "extraArgs": {
+      "label": "Extra args",
+      "help": "Additional static CLI args appended to codex exec/exec resume."
+    },
+    "cancelGraceMs": {
+      "label": "Cancel grace (ms)",
+      "help": "SIGTERM grace period before SIGKILL in cancel/close."
+    }
+  }
+}
