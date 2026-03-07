@@ -258,15 +258,17 @@ export class CodexCliRuntime {
   }
 
   _buildRunArgs(state) {
-    const options = ["--json", "--skip-git-repo-check", "-C", state.cwd];
-    if (this.config.model) options.push("--model", this.config.model);
-    if (this.config.sandbox) options.push("--sandbox", this.config.sandbox);
-    if (this.config.extraArgs.length > 0) options.push(...this.config.extraArgs);
-
     if (state.mode === "persistent" && state.codexSessionId) {
-      return ["exec", "resume", ...options, state.codexSessionId, "-"];
+      const resumeOptions = ["--json", "--skip-git-repo-check"];
+      if (this.config.model) resumeOptions.push("--model", this.config.model);
+      return ["exec", "resume", ...resumeOptions, state.codexSessionId, "-"];
     }
-    return ["exec", ...options, "-"];
+
+    const execOptions = ["--json", "--skip-git-repo-check"];
+    if (this.config.model) execOptions.push("--model", this.config.model);
+    if (this.config.sandbox) execOptions.push("--sandbox", this.config.sandbox);
+    if (this.config.extraArgs.length > 0) execOptions.push(...this.config.extraArgs);
+    return ["exec", ...execOptions, "-"];
   }
 
   async _spawnAndCollect(args) {

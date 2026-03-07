@@ -1,5 +1,5 @@
 {
-  "name": "codex-cli-session",
+  "name": "openclaw-codex-cli-session",
   "version": "0.1.0",
   "description": "OpenClaw ACP runtime plugin that delegates session turns to local Codex CLI",
   "type": "module",
