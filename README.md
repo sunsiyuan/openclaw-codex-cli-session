@@ -63,6 +63,7 @@ openclaw restart
 - `/codex`：返回推荐映射命令（默认映射到持久会话）
 - `/codex_status`：快速看 codex-cli 后端配置与健康状态
 - `/codex_off`：返回关闭当前 ACP 会话的命令
+- `/codex_danger`：直接启动 `danger-full-access` 的 Codex 会话（适合 WSL2 受限场景）
 
 你也可以直接用原生 ACP 指令：
 

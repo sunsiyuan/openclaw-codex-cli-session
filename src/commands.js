@@ -57,6 +57,28 @@ function parseMode(rawArgs) {
   return "persistent";
 }
 
+async function startCodexSession(params) {
+  const mgr = await loadAcpSessionManager();
+  const sessionKey = resolveSessionKey(params.ctx);
+  const initialized = await mgr.initializeSession({
+    cfg: params.ctx.config,
+    sessionKey,
+    agent: "codex",
+    mode: params.mode,
+  });
+
+  if (params.sandbox) {
+    await mgr.setSessionConfigOption({
+      cfg: params.ctx.config,
+      sessionKey,
+      key: "sandbox",
+      value: params.sandbox,
+    });
+  }
+
+  return { sessionKey, initialized };
+}
+
 export function registerCodexCommands(api) {
   api.registerCommand({
     name: "codex",
@@ -107,13 +129,9 @@ export function registerCodexCommands(api) {
       }
 
       try {
-        const mgr = await loadAcpSessionManager();
-        const sessionKey = resolveSessionKey(ctx);
         const mode = parseMode(raw);
-        const initialized = await mgr.initializeSession({
-          cfg: ctx.config,
-          sessionKey,
-          agent: "codex",
+        const { sessionKey, initialized } = await startCodexSession({
+          ctx,
           mode,
         });
 
@@ -137,6 +155,35 @@ export function registerCodexCommands(api) {
     name: "codex_status",
     description: "Check Codex ACP backend status quickly.",
     handler: async (ctx) => ({ text: renderStatusText(ctx) }),
+  });
+
+  api.registerCommand({
+    name: "codex_danger",
+    description: "Start Codex ACP session with sandbox=danger-full-access.",
+    acceptsArgs: true,
+    handler: async (ctx) => {
+      try {
+        const mode = parseMode((ctx.args ?? "").trim());
+        const { sessionKey, initialized } = await startCodexSession({
+          ctx,
+          mode,
+          sandbox: "danger-full-access",
+        });
+        return {
+          text: [
+            "Codex ACP session started (danger mode).",
+            `- key: ${sessionKey}`,
+            `- backend: ${initialized.meta.backend}`,
+            `- mode: ${initialized.meta.mode}`,
+            "- sandbox: danger-full-access",
+            "",
+            "Now just continue chatting in this thread.",
+          ].join("\n"),
+        };
+      } catch (error) {
+        return { text: `Failed to start Codex ACP danger session: ${String(error)}` };
+      }
+    },
   });
 
   api.registerCommand({
