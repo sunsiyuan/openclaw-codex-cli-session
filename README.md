@@ -1,175 +1,35 @@
 # openclaw-codex-cli-session
 
-> OpenClaw 的会话级 Codex CLI 后端插件（ACP Runtime Backend）。
+> **目标**：在 OpenClaw 里用你的 **Codex 订阅额度** 干活——在 Telegram、Discord 或 IDE 里和 OpenClaw 对话时，让「用 Codex」的那部分请求走本机 `codex`，消耗你的 Codex 额度，不占主模型额度。
 
-## 中文（先看这里）
+## 一句话说明
 
-### 这个仓库到底有多有用
-
-如果你想让 OpenClaw 的 ACP 会话真正走本机 `codex` CLI（并复用 Codex thread/session），这个仓库直接提供可运行方案，而不是概念示例。
-
-它解决的是「会话执行链路」问题，不是「提示词润色」问题：
-- 通过插件注册真实 ACP backend：`codex-cli`
-- 每个 turn 真调用 `codex exec --json`
-- 持久会话使用 `codex exec resume`
-- 支持 `doctor()` 与本地 smoke 校验
-
-适合人群：
-- 已经在用 OpenClaw ACP
-- 希望会话持续复用 Codex 上下文
-- 需要可调试、可验证、可回滚的插件化接入
-
-### 已实现能力（MVP）
-
-- OpenClaw 插件骨架与 manifest
-- ACP backend 注册（`codex-cli`）
-- turn 事件流解析（`agent_message` -> text）
-- persistent resume（已修复 resume 参数兼容问题）
-- 本地验证脚本：`npm run smoke`
-
-### 明确边界（没做）
-
-- 不做多 provider 路由器
-- 不做 gemini/provider 切换层
-- 不做 `/model` 别名系统
-- 不做复杂事件语义映射（仅最小文本链路）
-
-## 安装与使用（中文）
-
-### 1) 克隆仓库
-
-```bash
-git clone git@github.com:sunsiyuan/openclaw-codex-cli-session.git
-cd openclaw-codex-cli-session
-```
-
-### 2) 以本地链接方式安装插件
-
-```bash
-openclaw plugins install -l .
-openclaw plugins enable codex-cli-session
-openclaw plugins enable acpx
-```
-
-### 3) 配置 ACP 后端为 `codex-cli`
-
-```bash
-openclaw config set acp.enabled true
-openclaw config set acp.backend codex-cli
-```
-
-### 4) 重启 OpenClaw Gateway
-
-```bash
-openclaw restart
-```
-
-### 5) 验证你真的在用 Codex
-
-在聊天里执行：
-
-```text
-/acp doctor
-```
-
-预期至少包含：
-- `configuredBackend: codex-cli`
-- `registeredBackend: codex-cli`
-- `healthy: yes`
-- `runtimeDoctor: ok (codex CLI available: ...)`
-
-随后开启会话并测试：
-
-```text
-/acp spawn codex --mode persistent --thread off
-Reply with exactly FIRST_OK
-Now reply with exactly SECOND_OK and nothing else
-```
-
-### 6) 关闭 ACP 会话
-
-```text
-/acp close
-```
-
-多会话时：
-
-```text
-/acp ps
-/acp close <session-id>
-```
-
-## 故障排查（中文）
-
-- 报 `ACP_BACKEND_MISSING`：通常是 `acpx` 没启用，或网关未重启
-- 报 `configuredBackend: acpx`：说明还没切到 `acp.backend=codex-cli`
-- 报 `codex not available`：检查 `codex --version` 和登录状态
-- 插件告警 `plugins.allow is empty`：安全建议，不是功能阻塞
-
-## 发布到 OpenClaw 生态（中文）
-
-先说结论：
-- 这是 **插件仓库**，不是技能仓库
-- **技能** 发布到 ClawHub
-- **插件** 主要通过 npm + 社区插件列表 PR 暴露
-
-### A. 发布插件（推荐路径）
-
-1. 发布 npm 包（确保 `openclaw.extensions` 指向入口）
-2. 用户安装：`openclaw plugins install <npm-spec>`
-3. 向 OpenClaw 社区插件页面提 PR（附名称、npm 包、GitHub、安装命令）
-
-### B. 发布技能（仅当你另做 skill）
-
-如果你另建 `skills/<name>/SKILL.md` 技能包，可用 `clawhub` 发布到 ClawHub。
-
-## GitHub Pages（项目说明页）
-
-本仓库已提供 Pages 工作流与页面文件：
-- `.github/workflows/deploy-pages.yml`
-- `docs/index.html`
-
-推送到 `master` 后会自动部署（需仓库 Settings 中启用 Pages: Source = GitHub Actions）。
+**已经有 Codex 订阅的人**，装好这个插件并做完一次配置后，在 OpenClaw 里说「用 Codex 做这件事」或发一条开 Codex 的指令，就会真正走本机 `codex`；**额度算在 Codex 上**。
 
 ---
 
-## English
+## 适合谁
 
-### Why this repo is useful
+- 已有 **Codex 订阅**，想在同一套 OpenClaw 里把这份额度用起来。
+- 希望「用 Codex」的对话能多轮连续、可验证、需要时能关掉或换回别的后端。
 
-This repository provides a real, session-level ACP backend plugin for OpenClaw that delegates turns to the local `codex` CLI, with persistent resume support.
+---
 
-It solves execution-path integration (not prompt tricks):
-- Registers a real ACP backend: `codex-cli`
-- Executes each turn via `codex exec --json`
-- Reuses Codex thread/session with `codex exec resume`
-- Includes health checks and smoke testing
+## 安装与配置（用户必做）
 
-### MVP capabilities
+### 1. 前置条件
 
-- Loadable OpenClaw plugin + manifest
-- ACP backend registration (`codex-cli`)
-- JSON event parsing to text output
-- Persistent session resume support
-- Local smoke validation script (`npm run smoke`)
+- 本机已安装并登录 **Codex CLI**（`codex --version` 能跑通）。
+- 已安装 **OpenClaw**，并能执行 `openclaw` 命令。
 
-### Out of scope
-
-- Multi-provider router/switcher
-- Gemini/provider abstraction layer
-- `/model` alias system
-- Full event semantic mapping beyond core text path
-
-## Install and use
-
-### 1) Clone
+### 2. 安装插件并启用
 
 ```bash
 git clone git@github.com:sunsiyuan/openclaw-codex-cli-session.git
 cd openclaw-codex-cli-session
 ```
 
-### 2) Install plugin (linked)
+用「本地链接」方式安装并启用（第二行是依赖，顺带启用即可）：
 
 ```bash
 openclaw plugins install -l .
@@ -177,77 +37,165 @@ openclaw plugins enable codex-cli-session
 openclaw plugins enable acpx
 ```
 
-### 3) Configure ACP backend
+### 3. 让 OpenClaw 用本机 Codex
 
 ```bash
 openclaw config set acp.enabled true
 openclaw config set acp.backend codex-cli
 ```
 
-### 4) Restart gateway
+### 4. 重启网关
 
 ```bash
 openclaw restart
 ```
 
-### 5) Verify you are actually using Codex
+---
 
-Run in chat:
+## 你怎么操作：快捷指令与自然语言
+
+配置好后，**在 OpenClaw 的聊天里**（Telegram/Discord/IDE 等）可以这样用。
+
+### 关于 /codex：快捷方式是什么
+
+OpenClaw 里**没有单独的 `/codex` 斜杠指令**。用 Codex 的快捷方式就是发 **`/acp spawn codex`**（可加参数）。例如最简常用写法：
+
+- 持久多轮：`/acp spawn codex --mode persistent --thread off`
+- 一次性：`/acp spawn codex --mode oneshot --thread off`
+
+也可以直接说自然语言「用 Codex 做这件事」，由 OpenClaw 路由到本机 Codex（见下文）。
+
+### 先确认真的在用 Codex
+
+在任意会话里发：
 
 ```text
 /acp doctor
 ```
 
-Expected fields:
+预期至少能看到：
+
 - `configuredBackend: codex-cli`
 - `registeredBackend: codex-cli`
 - `healthy: yes`
 - `runtimeDoctor: ok (codex CLI available: ...)`
 
-Then run a persistent session test:
+看到这些就说明「用 Codex」的请求已经走本机 Codex，额度会扣在 Codex 上。
+
+### 开一个 Codex 会话（快捷指令）
+
+**持久会话**（多轮同一会话，适合连续编程任务）：
 
 ```text
 /acp spawn codex --mode persistent --thread off
-Reply with exactly FIRST_OK
-Now reply with exactly SECOND_OK and nothing else
 ```
 
-### 6) Close ACP session
+若当前频道支持「按 thread 绑定」（如 Telegram 话题、Discord 子频道）：
 
 ```text
-/acp close
+/acp spawn codex --mode persistent --thread auto
 ```
 
-For multiple sessions:
+**一次性跑完就结束**：
 
 ```text
-/acp ps
-/acp close <session-id>
+/acp spawn codex --mode oneshot --thread off
 ```
 
-## Troubleshooting
+常用参数简要说明：
 
-- `ACP_BACKEND_MISSING`: `acpx` not enabled, or gateway restart missing
-- Backend still `acpx`: set `acp.backend=codex-cli`
-- `codex not available`: check `codex --version` and auth state
-- `plugins.allow is empty`: security recommendation, non-blocking
+| 参数 | 含义 |
+|------|------|
+| `--mode persistent` | 持久会话，多轮对话复用同一 Codex session |
+| `--mode oneshot` | 单次执行，不保留会话 |
+| `--thread auto` | 能绑 thread 就绑（当前在 thread 里就绑当前 thread） |
+| `--thread here` | 必须在已有 thread 里使用，绑定当前 thread |
+| `--thread off` | 不绑定 thread |
+| `--cwd /path` | 指定工作目录 |
+| `--label 名字` | 给会话起个标签，方便后面用 `/acp close 名字` 等 |
 
-## Publishing to OpenClaw ecosystem
+### 自然语言也可以
 
-This repo is a **plugin**, not a skill.
+在 OpenClaw 里直接说人话，例如：
 
-Plugin distribution path:
-1. Publish npm package with valid `openclaw.extensions`
-2. Install via `openclaw plugins install <npm-spec>`
-3. Submit to OpenClaw community plugins page via PR
+- 「用 Codex 做这件事」
+- 「在 thread 里开一个持久的 Codex 会话，专注在这个任务上」
+- 「用 Codex 一次性跑完并总结结果」
 
-Skill distribution path (separate artifact):
-- Publish skills via ClawHub (`clawhub` CLI / clawhub.ai)
+配置好本插件并指向 codex-cli 后，这类请求会被路由到本机 Codex，消耗你的 Codex 额度。
+
+### 日常会用到的指令（/acp 开头）
+
+| 指令 | 作用 |
+|------|------|
+| `/acp doctor` | 确认是否在用本机 Codex、环境是否正常 |
+| `/acp spawn codex ...` | 开一个 Codex 会话（见上面参数说明） |
+| `/acp status` | 看当前 Codex 会话的状态、模式、超时等 |
+| `/acp sessions` | 列出最近的 Codex 会话（查 id/标签时用） |
+| `/acp close` | 关闭当前会话并解除绑定 |
+| `/acp close <session-id或标签>` | 关闭指定会话（多会话时用） |
+| `/acp cancel` | 取消当前正在执行的一轮，不关会话 |
+| `/acp steer <一句话>` | 给当前会话发一条「指导」（如：收紧日志、继续）不替换上下文 |
+| `/acp timeout <秒数>` | 设置超时 |
+| `/acp model <模型名>` | 设置模型覆盖（若后端支持） |
+| `/acp cwd <路径>` | 设置/改工作目录 |
+| `/acp reset-options` | 清掉当前会话的运行时覆盖项 |
+| `/acp install` | 打印安装与启用步骤（方便复现环境） |
+
+多会话时：先用 `/acp sessions` 看列表，再用 `/acp close <session-id或标签>` 关指定会话。
+
+### 小结：你实际在做什么
+
+1. **目标**：在 OpenClaw 里用 Codex 额度干活。
+2. **一次配置**：装插件 → 启用本插件和依赖 acpx → 设为用 codex-cli → 重启。
+3. **平时用**：在聊天里发 `/acp spawn codex ...` 或自然语言「用 Codex 做 xxx」。
+4. **确认**：`/acp doctor` 里看到在用 codex-cli 且 healthy。
+5. **管理**：`/acp status`、`/acp sessions`、`/acp close`、`/acp cancel`、`/acp steer` 等。
+
+这样，凡是「用 Codex」的对话都走本机 `codex`，**额度从你的 Codex 订阅扣**。
+
+---
+
+## 故障排查
+
+遇到报错时可以先看这里：
+
+| 现象 | 可能原因 | 处理 |
+|------|----------|------|
+| 报后端缺失或未就绪 | 依赖插件未启用或网关未重启 | 执行 `openclaw plugins enable acpx` 并 `openclaw restart` |
+| 发现还在用 acpx、没走 Codex | 未切到 codex-cli | `openclaw config set acp.backend codex-cli` 后重启 |
+| 报 codex 不可用 | 本机 codex 未装或未登录 | 终端跑 `codex --version`，检查安装与登录 |
+| 插件提示 `plugins.allow is empty` | 安全建议（允许列表为空） | 仅提示，不阻塞功能；需要时可配置 `plugins.allow` |
+
+---
+
+## 技术边界（给想深挖的人）
+
+- 本插件只做 **会话级 Codex CLI 接入**：每轮调本机 `codex exec`，持久会话用 `codex exec resume`。
+- **不做**：多 provider 路由、Gemini/其他 provider 切换、`/model` 别名体系；仅保证「用 Codex」时的最小可用链路。
+
+---
+
+## 发布与生态（维护者向）
+
+- 这是 **插件** 仓库，不是技能仓库。**技能** 发 ClawHub，**插件** 通过 npm + 社区插件列表 PR 暴露。
+- 发布插件：发 npm 包（`openclaw.extensions` 指向入口）→ 用户 `openclaw plugins install <npm-spec>` → 向 OpenClaw 社区插件页提 PR。
+
+---
 
 ## GitHub Pages
 
-This repo includes a Pages workflow and site:
+仓库内已有 Pages 工作流与页面：
+
 - `.github/workflows/deploy-pages.yml`
 - `docs/index.html`
 
-After pushing to `master`, Pages deploy runs automatically (if repo Pages is set to GitHub Actions).
+在仓库设置中启用 Pages（Source = GitHub Actions），推送到默认分支后会自动部署。
+
+---
+
+## English (short)
+
+**Goal:** Use your Codex subscription from OpenClaw—when you ask OpenClaw to use Codex or spawn a Codex session, it runs your local `codex` CLI and consumes your Codex quota.
+
+**Quick setup:** Clone → `openclaw plugins install -l .` → enable `codex-cli-session` and `acpx` (dependency) → `openclaw config set acp.backend codex-cli` → `openclaw restart`. In chat: `/acp doctor` to verify, then `/acp spawn codex --mode persistent --thread off` (or use natural language like “run this in Codex”). Use `/acp status`, `/acp close`, `/acp cancel`, `/acp sessions` to manage sessions. See the Chinese section above for the full command list.
