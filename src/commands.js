@@ -1,11 +1,37 @@
 import { getAcpRuntimeBackend } from "openclaw/plugin-sdk";
 
+const ACP_MANAGER_MODULE =
+  process.env.OPENCLAW_ACP_MANAGER_MODULE ?? "file:///usr/lib/node_modules/openclaw/dist/reply-DhtejUNZ.js";
+
 function resolveConfiguredBackend(config) {
   return config?.acp && typeof config.acp === "object" ? config.acp.backend : undefined;
 }
 
 function boolLabel(value) {
   return value ? "yes" : "no";
+}
+
+async function loadAcpSessionManager() {
+  const mod = await import(ACP_MANAGER_MODULE);
+  if (typeof mod?.Br !== "function") {
+    throw new Error("ACP session manager export not found in current OpenClaw build");
+  }
+  return mod.Br();
+}
+
+function resolveSessionKey(ctx) {
+  const channel = typeof ctx.channel === "string" ? ctx.channel.trim() : "";
+  const from = typeof ctx.from === "string" ? ctx.from.trim() : "";
+  if (!channel || !from) {
+    throw new Error("missing channel/from in command context");
+  }
+
+  const prefix = `${channel}:`;
+  const peer = from.startsWith(prefix) ? from.slice(prefix.length) : from;
+  if (!peer) {
+    throw new Error("cannot resolve peer id from context");
+  }
+  return `agent:main:${channel}:direct:${peer}`;
 }
 
 function renderStatusText(ctx) {
@@ -24,15 +50,11 @@ function renderStatusText(ctx) {
   ].join("\n");
 }
 
-function renderSpawnHint(args = "") {
-  const suffix = args.trim();
-  const mapped = suffix ? `/acp spawn codex ${suffix}` : "/acp spawn codex --mode persistent --thread off";
-  return [
-    "Codex shortcut:",
-    `- mapped command: ${mapped}`,
-    "",
-    "Send the mapped /acp command in chat to start the Codex ACP session.",
-  ].join("\n");
+function parseMode(rawArgs) {
+  const raw = rawArgs.trim().toLowerCase();
+  if (!raw) return "persistent";
+  if (raw.includes("oneshot")) return "oneshot";
+  return "persistent";
 }
 
 export function registerCodexCommands(api) {
@@ -44,24 +66,70 @@ export function registerCodexCommands(api) {
       const raw = (ctx.args ?? "").trim();
       const action = raw.toLowerCase();
 
-      if (!action || action === "on" || action === "start") {
-        return { text: renderSpawnHint("") };
-      }
       if (action === "status") {
-        return { text: renderStatusText(ctx) };
+        try {
+          const mgr = await loadAcpSessionManager();
+          const sessionKey = resolveSessionKey(ctx);
+          const status = await mgr.getSessionStatus({
+            cfg: ctx.config,
+            sessionKey,
+          });
+          return {
+            text: [
+              renderStatusText(ctx),
+              "",
+              "Session:",
+              `- key: ${status.sessionKey}`,
+              `- backend: ${status.backend}`,
+              `- mode: ${status.mode}`,
+              `- state: ${status.state}`,
+            ].join("\n"),
+          };
+        } catch {
+          return { text: renderStatusText(ctx) };
+        }
       }
       if (action === "off" || action === "close") {
-        return {
-          text: [
-            "Codex shortcut:",
-            "- mapped command: /acp close",
-            "",
-            "Send /acp close in chat to close the current ACP session.",
-          ].join("\n"),
-        };
+        try {
+          const mgr = await loadAcpSessionManager();
+          const sessionKey = resolveSessionKey(ctx);
+          await mgr.closeSession({
+            cfg: ctx.config,
+            sessionKey,
+            reason: "codex-shortcut-close",
+            clearMeta: true,
+            allowBackendUnavailable: true,
+          });
+          return { text: `Closed Codex ACP session.\n- key: ${sessionKey}` };
+        } catch (error) {
+          return { text: `Failed to close Codex ACP session: ${String(error)}` };
+        }
       }
 
-      return { text: renderSpawnHint(raw) };
+      try {
+        const mgr = await loadAcpSessionManager();
+        const sessionKey = resolveSessionKey(ctx);
+        const mode = parseMode(raw);
+        const initialized = await mgr.initializeSession({
+          cfg: ctx.config,
+          sessionKey,
+          agent: "codex",
+          mode,
+        });
+
+        return {
+          text: [
+            "Codex ACP session started.",
+            `- key: ${sessionKey}`,
+            `- backend: ${initialized.meta.backend}`,
+            `- mode: ${initialized.meta.mode}`,
+            "",
+            "Now just continue chatting in this thread.",
+          ].join("\n"),
+        };
+      } catch (error) {
+        return { text: `Failed to start Codex ACP session: ${String(error)}` };
+      }
     },
   });
 
@@ -74,13 +142,21 @@ export function registerCodexCommands(api) {
   api.registerCommand({
     name: "codex_off",
     description: "Show quick command to close current Codex ACP session.",
-    handler: async () => ({
-      text: [
-        "Codex shortcut:",
-        "- mapped command: /acp close",
-        "",
-        "Send /acp close in chat to close the current ACP session.",
-      ].join("\n"),
-    }),
+    handler: async (ctx) => {
+      try {
+        const mgr = await loadAcpSessionManager();
+        const sessionKey = resolveSessionKey(ctx);
+        await mgr.closeSession({
+          cfg: ctx.config,
+          sessionKey,
+          reason: "codex-shortcut-close",
+          clearMeta: true,
+          allowBackendUnavailable: true,
+        });
+        return { text: `Closed Codex ACP session.\n- key: ${sessionKey}` };
+      } catch (error) {
+        return { text: `Failed to close Codex ACP session: ${String(error)}` };
+      }
+    },
   });
 }
