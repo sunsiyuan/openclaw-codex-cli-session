@@ -1,4 +1,5 @@
 import { createCodexCliAcpService } from "./service.js";
+import { registerCodexCommands } from "./commands.js";
 
 const plugin = {
   id: "codex-cli-session",
@@ -15,6 +16,7 @@ const plugin = {
         pluginConfig: api.pluginConfig,
       }),
     );
+    registerCodexCommands(api);
   },
 };
 

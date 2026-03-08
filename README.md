@@ -58,12 +58,16 @@ openclaw restart
 
 ### 关于 /codex：快捷方式是什么
 
-OpenClaw 里**没有单独的 `/codex` 斜杠指令**。用 Codex 的快捷方式就是发 **`/acp spawn codex`**（可加参数）。例如最简常用写法：
+本插件提供了三个快捷指令：
+
+- `/codex`：返回推荐映射命令（默认映射到持久会话）
+- `/codex_status`：快速看 codex-cli 后端配置与健康状态
+- `/codex_off`：返回关闭当前 ACP 会话的命令
+
+你也可以直接用原生 ACP 指令：
 
 - 持久多轮：`/acp spawn codex --mode persistent --thread off`
 - 一次性：`/acp spawn codex --mode oneshot --thread off`
-
-也可以直接说自然语言「用 Codex 做这件事」，由 OpenClaw 路由到本机 Codex（见下文）。
 
 ### 先确认真的在用 Codex
 
