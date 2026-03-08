@@ -62,7 +62,7 @@ openclaw restart
 
 - **`/codex`**：直接开一个 Codex 会话（默认持久多轮）。可带参数，例如 `/codex --mode oneshot` 开一次性会话。开会后在本 thread 继续聊即可。
 - **`/codex_status`**：快速看 codex-cli 后端是否配置、是否健康（仅查看，不执行会话操作）。
-- **`/codex_off`**：直接关闭当前会话对应的 Codex ACP 会话。
+- **`/codex_off`**：关闭当前 Codex 会话，但保留线程 ACP 绑定（后续仍可执行）。
 - **`/codex_danger`**：直接开一个带 `danger-full-access` sandbox 的 Codex 会话（适合 WSL2 等权限受限环境）。
 
 若需要更细控制（如 `--thread`、`--cwd`、`--label`），可以用原生 ACP 指令：
@@ -137,7 +137,7 @@ openclaw restart
 |------|------|
 | `/codex` | 直接开 Codex 会话（默认持久；可带参数如 `--mode oneshot`） |
 | `/codex_status` | 查看后端是否在用 codex-cli、是否健康 |
-| `/codex_off` | 直接关闭当前 Codex 会话 |
+| `/codex_off` | 关闭当前 Codex 会话，但保留可执行状态 |
 | `/codex_danger` | 直接开带 danger-full-access 的 Codex 会话（如 WSL2） |
 
 **原生 ACP 指令（/acp 开头，可细调参数）：**

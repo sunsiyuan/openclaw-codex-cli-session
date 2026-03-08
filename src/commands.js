@@ -79,6 +79,19 @@ async function startCodexSession(params) {
   return { sessionKey, initialized };
 }
 
+async function closeCodexSession(params) {
+  const mgr = await loadAcpSessionManager();
+  const sessionKey = resolveSessionKey(params.ctx);
+  await mgr.closeSession({
+    cfg: params.ctx.config,
+    sessionKey,
+    reason: params.reason ?? "codex-shortcut-close",
+    clearMeta: Boolean(params.clearMeta),
+    allowBackendUnavailable: true,
+  });
+  return { sessionKey };
+}
+
 export function registerCodexCommands(api) {
   api.registerCommand({
     name: "codex",
@@ -113,16 +126,19 @@ export function registerCodexCommands(api) {
       }
       if (action === "off" || action === "close") {
         try {
-          const mgr = await loadAcpSessionManager();
-          const sessionKey = resolveSessionKey(ctx);
-          await mgr.closeSession({
-            cfg: ctx.config,
-            sessionKey,
-            reason: "codex-shortcut-close",
-            clearMeta: true,
-            allowBackendUnavailable: true,
+          const { sessionKey } = await closeCodexSession({
+            ctx,
+            reason: "codex-shortcut-close-keep-binding",
+            clearMeta: false,
           });
-          return { text: `Closed Codex ACP session.\n- key: ${sessionKey}` };
+          return {
+            text: [
+              "Codex session closed (ACP binding kept).",
+              `- key: ${sessionKey}`,
+              "",
+              "This thread can still execute tasks.",
+            ].join("\n"),
+          };
         } catch (error) {
           return { text: `Failed to close Codex ACP session: ${String(error)}` };
         }
@@ -188,19 +204,22 @@ export function registerCodexCommands(api) {
 
   api.registerCommand({
     name: "codex_off",
-    description: "Show quick command to close current Codex ACP session.",
+    description: "Close current Codex session but keep ACP execution enabled for this thread.",
     handler: async (ctx) => {
       try {
-        const mgr = await loadAcpSessionManager();
-        const sessionKey = resolveSessionKey(ctx);
-        await mgr.closeSession({
-          cfg: ctx.config,
-          sessionKey,
-          reason: "codex-shortcut-close",
-          clearMeta: true,
-          allowBackendUnavailable: true,
+        const { sessionKey } = await closeCodexSession({
+          ctx,
+          reason: "codex-shortcut-close-keep-binding",
+          clearMeta: false,
         });
-        return { text: `Closed Codex ACP session.\n- key: ${sessionKey}` };
+        return {
+          text: [
+            "Codex session closed (ACP binding kept).",
+            `- key: ${sessionKey}`,
+            "",
+            "This thread can still execute tasks.",
+          ].join("\n"),
+        };
       } catch (error) {
         return { text: `Failed to close Codex ACP session: ${String(error)}` };
       }
