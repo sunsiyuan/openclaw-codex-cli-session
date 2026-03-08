@@ -58,14 +58,14 @@ openclaw restart
 
 ### 关于 /codex：快捷方式是什么
 
-本插件提供了三个快捷指令：
+本插件提供了四个快捷指令（**发在聊天里会直接执行**，无需再复制命令）：
 
-- `/codex`：返回推荐映射命令（默认映射到持久会话）
-- `/codex_status`：快速看 codex-cli 后端配置与健康状态
-- `/codex_off`：返回关闭当前 ACP 会话的命令
-- `/codex_danger`：直接启动 `danger-full-access` 的 Codex 会话（适合 WSL2 受限场景）
+- **`/codex`**：直接开一个 Codex 会话（默认持久多轮）。可带参数，例如 `/codex --mode oneshot` 开一次性会话。开会后在本 thread 继续聊即可。
+- **`/codex_status`**：快速看 codex-cli 后端是否配置、是否健康（仅查看，不执行会话操作）。
+- **`/codex_off`**：直接关闭当前会话对应的 Codex ACP 会话。
+- **`/codex_danger`**：直接开一个带 `danger-full-access` sandbox 的 Codex 会话（适合 WSL2 等权限受限环境）。
 
-你也可以直接用原生 ACP 指令：
+若需要更细控制（如 `--thread`、`--cwd`、`--label`），可以用原生 ACP 指令：
 
 - 持久多轮：`/acp spawn codex --mode persistent --thread off`
 - 一次性：`/acp spawn codex --mode oneshot --thread off`
@@ -129,13 +129,24 @@ openclaw restart
 
 配置好本插件并指向 codex-cli 后，这类请求会被路由到本机 Codex，消耗你的 Codex 额度。
 
-### 日常会用到的指令（/acp 开头）
+### 日常会用到的指令
+
+**本插件快捷指令（直接执行）：**
 
 | 指令 | 作用 |
 |------|------|
-| `/acp doctor` | 确认是否在用本机 Codex、环境是否正常 |
-| `/acp spawn codex ...` | 开一个 Codex 会话（见上面参数说明） |
-| `/acp status` | 看当前 Codex 会话的状态、模式、超时等 |
+| `/codex` | 直接开 Codex 会话（默认持久；可带参数如 `--mode oneshot`） |
+| `/codex_status` | 查看后端是否在用 codex-cli、是否健康 |
+| `/codex_off` | 直接关闭当前 Codex 会话 |
+| `/codex_danger` | 直接开带 danger-full-access 的 Codex 会话（如 WSL2） |
+
+**原生 ACP 指令（/acp 开头，可细调参数）：**
+
+| 指令 | 作用 |
+|------|------|
+| `/acp doctor` | 完整诊断：是否在用本机 Codex、环境是否正常 |
+| `/acp spawn codex ...` | 开 Codex 会话（可加 --thread、--cwd、--label 等） |
+| `/acp status` | 看当前会话状态、模式、超时等 |
 | `/acp sessions` | 列出最近的 Codex 会话（查 id/标签时用） |
 | `/acp close` | 关闭当前会话并解除绑定 |
 | `/acp close <session-id或标签>` | 关闭指定会话（多会话时用） |
@@ -153,7 +164,7 @@ openclaw restart
 
 1. **目标**：在 OpenClaw 里用 Codex 额度干活。
 2. **一次配置**：装插件 → 启用本插件和依赖 acpx → 设为用 codex-cli → 重启。
-3. **平时用**：在聊天里发 `/acp spawn codex ...` 或自然语言「用 Codex 做 xxx」。
+3. **平时用**：在聊天里发 `/codex` 直接开 Codex 会话，或 `/acp spawn codex ...`、自然语言「用 Codex 做 xxx」。
 4. **确认**：`/acp doctor` 里看到在用 codex-cli 且 healthy。
 5. **管理**：`/acp status`、`/acp sessions`、`/acp close`、`/acp cancel`、`/acp steer` 等。
 
