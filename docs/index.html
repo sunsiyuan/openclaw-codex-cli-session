@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>openclaw-codex-cli-session</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #22d3ee;
+        --ok: #34d399;
+      }
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 10% 10%, #1f2937 0%, var(--bg) 50%);
+        color: var(--text);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 20px 60px;
+      }
+      .card {
+        background: rgba(17, 24, 39, 0.92);
+        border: 1px solid rgba(34, 211, 238, 0.3);
+        border-radius: 14px;
+        padding: 20px;
+        margin-bottom: 18px;
+      }
+      h1, h2 { margin: 0 0 10px; }
+      h1 { color: var(--accent); }
+      code {
+        background: #0b1220;
+        padding: 2px 6px;
+        border-radius: 6px;
+      }
+      pre {
+        background: #0b1220;
+        border: 1px solid #1f2937;
+        border-radius: 10px;
+        padding: 12px;
+        overflow-x: auto;
+      }
+      .ok { color: var(--ok); }
+      .muted { color: var(--muted); }
+      a { color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <section class="card">
+        <h1>openclaw-codex-cli-session</h1>
+        <p>Session-level Codex CLI backend plugin for OpenClaw ACP.</p>
+        <p class="muted">让 OpenClaw 的 ACP 会话真正走本机 Codex CLI，并支持 persistent resume。</p>
+      </section>
+
+      <section class="card">
+        <h2>Quick Install</h2>
+        <pre><code>git clone git@github.com:sunsiyuan/openclaw-codex-cli-session.git
+cd openclaw-codex-cli-session
+openclaw plugins install -l .
+openclaw plugins enable codex-cli-session
+openclaw plugins enable acpx
+openclaw config set acp.enabled true
+openclaw config set acp.backend codex-cli
+openclaw restart</code></pre>
+      </section>
+
+      <section class="card">
+        <h2>Verify</h2>
+        <pre><code>/acp doctor
+/acp spawn codex --mode persistent --thread off</code></pre>
+        <p class="ok">Expected: configuredBackend = codex-cli, registeredBackend = codex-cli, healthy = yes</p>
+      </section>
+
+      <section class="card">
+        <h2>Project Links</h2>
+        <ul>
+          <li><a href="https://github.com/sunsiyuan/openclaw-codex-cli-session">GitHub Repository</a></li>
+          <li><a href="https://docs.openclaw.ai/tools/plugin">OpenClaw Plugin Docs</a></li>
+          <li><a href="https://docs.openclaw.ai/plugins/community">OpenClaw Community Plugins</a></li>
+          <li><a href="https://docs.openclaw.ai/tools/clawhub">ClawHub (skills registry)</a></li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
