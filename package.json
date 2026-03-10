@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "description": "OpenClaw ACP runtime plugin that delegates session turns to local Codex CLI",
   "type": "module",
-  "private": true,
   "openclaw": {
     "extensions": [
       "./src/index.js"

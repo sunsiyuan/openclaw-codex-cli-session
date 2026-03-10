@@ -24,12 +24,23 @@ Submission requirements (from docs):
 - Setup/use docs + issue tracker
 - Clear maintenance signal
 
-Submit via PR with:
-- Plugin name
-- npm package name
-- GitHub repo URL
-- One-line description
-- Install command
+**提交方式**：在 [openclaw/openclaw](https://github.com/openclaw/openclaw) 仓库中编辑 `docs/plugins/community.md`，在 “Listed plugins” 下按格式追加一条，然后提 PR。
+
+**本插件可用的条目（复制到 community.md 的 Listed plugins 下）：**
+
+```markdown
+- **Codex CLI Session** — Use your Codex subscription from OpenClaw: run local Codex CLI in chat via `/codex` and ACP commands; supports persistent and oneshot sessions.
+ npm: `codex-cli-session`
+ repo: `https://github.com/sunsiyuan/openclaw-codex-cli-session`
+ install: `openclaw plugins install codex-cli-session`
+```
+
+**操作步骤：**
+1. Fork https://github.com/openclaw/openclaw
+2. 克隆你的 fork，新建分支（如 `docs/add-codex-cli-session-plugin`）
+3. 编辑 `docs/plugins/community.md`，在 “## Listed plugins” 里 WeChat 那条之后追加上面这段
+4. 提交并 push 到你的 fork，在 GitHub 上对 `openclaw/openclaw` 的 `main` 开 PR，标题例如：`docs(plugins): add Codex CLI Session community plugin`
+5. 在 PR 里说明：npm 已发布、仓库有 README/Issues、维护者会持续维护
 
 ## 3) If you also build a Skill version (optional)
 
