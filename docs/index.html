@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>openclaw-codex-cli-session</title>
+    <title>OpenClaw Codex 插件 · 龙虾机器人用 Codex 干活</title>
+    <meta name="description" content="在 OpenClaw（龙虾机器人）里用你的 Codex 订阅额度干活，不占主模型额度。" />
     <style>
       :root {
         --bg: #0f172a;
@@ -33,7 +34,9 @@
         margin-bottom: 18px;
       }
       h1, h2 { margin: 0 0 10px; }
-      h1 { color: var(--accent); }
+      h1 { color: var(--accent); font-size: 1.5rem; }
+      h2 { font-size: 1.1rem; }
+      .tagline { color: var(--muted); font-size: 0.95rem; margin: 8px 0 0; }
       code {
         background: #0b1220;
         padding: 2px 6px;
@@ -49,18 +52,19 @@
       .ok { color: var(--ok); }
       .muted { color: var(--muted); }
       a { color: var(--accent); }
+      ul { margin: 0.5em 0; padding-left: 1.2em; }
     </style>
   </head>
   <body>
     <main class="wrap">
       <section class="card">
-        <h1>openclaw-codex-cli-session</h1>
-        <p>Session-level Codex CLI backend plugin for OpenClaw ACP.</p>
-        <p class="muted">让 OpenClaw 的 ACP 会话真正走本机 Codex CLI，并支持 persistent resume。</p>
+        <h1>OpenClaw Codex 插件（龙虾机器人 · 用 Codex 干活）</h1>
+        <p>在 <strong>OpenClaw（龙虾机器人）</strong> 里，用你自己的 Codex 订阅额度干活——在 Telegram、Discord 或 IDE 里说「用 Codex 做这件事」，请求就走你本机的 <code>codex</code>，扣的是你的 Codex 额度，不占主模型额度。</p>
+        <p class="tagline">适合已有 Codex 订阅、想在同一套对话里把额度用起来的用户。</p>
       </section>
 
       <section class="card">
-        <h2>Quick Install</h2>
+        <h2>快速安装</h2>
         <pre><code>git clone git@github.com:sunsiyuan/openclaw-codex-cli-session.git
 cd openclaw-codex-cli-session
 openclaw plugins install -l .
@@ -72,19 +76,20 @@ openclaw restart</code></pre>
       </section>
 
       <section class="card">
-        <h2>Verify</h2>
+        <h2>验证与使用</h2>
+        <p>在聊天里发 <code>/acp doctor</code> 确认已走本机 Codex，再发 <code>/codex</code> 即可开 Codex 会话。</p>
         <pre><code>/acp doctor
-/acp spawn codex --mode persistent --thread off</code></pre>
-        <p class="ok">Expected: configuredBackend = codex-cli, registeredBackend = codex-cli, healthy = yes</p>
+/codex</code></pre>
+        <p class="ok">预期：configuredBackend = codex-cli，healthy = yes。说「用 Codex 做这件事」也会被路由到本机 Codex。</p>
       </section>
 
       <section class="card">
-        <h2>Project Links</h2>
+        <h2>相关链接</h2>
         <ul>
-          <li><a href="https://github.com/sunsiyuan/openclaw-codex-cli-session">GitHub Repository</a></li>
-          <li><a href="https://docs.openclaw.ai/tools/plugin">OpenClaw Plugin Docs</a></li>
-          <li><a href="https://docs.openclaw.ai/plugins/community">OpenClaw Community Plugins</a></li>
-          <li><a href="https://docs.openclaw.ai/tools/clawhub">ClawHub (skills registry)</a></li>
+          <li><a href="https://github.com/sunsiyuan/openclaw-codex-cli-session">本仓库 GitHub</a></li>
+          <li><a href="https://docs.openclaw.ai/tools/plugin">OpenClaw（龙虾机器人）插件文档</a></li>
+          <li><a href="https://docs.openclaw.ai/plugins/community">OpenClaw 社区插件</a></li>
+          <li><a href="https://docs.openclaw.ai/tools/clawhub">ClawHub（技能库）</a></li>
         </ul>
       </section>
     </main>

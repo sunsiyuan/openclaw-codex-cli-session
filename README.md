@@ -1,26 +1,31 @@
-# openclaw-codex-cli-session
+# OpenClaw Codex 插件（龙虾机器人 · 用 Codex 干活）
 
-> **目标**：在 OpenClaw 里用你的 **Codex 订阅额度** 干活——在 Telegram、Discord 或 IDE 里和 OpenClaw 对话时，让「用 Codex」的那部分请求走本机 `codex`，消耗你的 Codex 额度，不占主模型额度。
-
-## 一句话说明
-
-**已经有 Codex 订阅的人**，装好这个插件并做完一次配置后，在 OpenClaw 里说「用 Codex 做这件事」或发一条开 Codex 的指令，就会真正走本机 `codex`；**额度算在 Codex 上**。
+> **一句话**：在 **OpenClaw（龙虾机器人）** 里，用你自己的 **Codex 订阅额度** 来干活——在 Telegram、Discord 或 IDE 里和龙虾机器人对话时，说「用 Codex 做这件事」，请求就会走你本机的 `codex`，**扣的是你的 Codex 额度**，不占主模型额度。
 
 ---
 
-## 适合谁
+## 你能得到什么
 
-- 已有 **Codex 订阅**，想在同一套 OpenClaw 里把这份额度用起来。
-- 希望「用 Codex」的对话能多轮连续、可验证、需要时能关掉或换回别的后端。
+- **已有 Codex 订阅**：装好并配置一次后，在 OpenClaw（龙虾机器人）里说「用 Codex 做这件事」或发一条开 Codex 的指令，就会真的走本机 Codex，额度算在 Codex 上。
+- **体验统一**：同一套对话入口（Telegram / Discord / IDE），需要时切到 Codex，多轮连续、可验证，不用时关掉或换回别的后端即可。
 
 ---
 
-## 安装与配置（用户必做）
+## 谁适合用
 
-### 1. 前置条件
+- 你已经有 **Codex 订阅**，想在同一套 OpenClaw（龙虾机器人）里把这份额度用起来。
+- 你希望「用 Codex」的对话能多轮连续、可验证，需要时能关掉或换回别的后端。
 
-- 本机已安装并登录 **Codex CLI**（`codex --version` 能跑通）。
-- 已安装 **OpenClaw**，并能执行 `openclaw` 命令。
+---
+
+## 第一次使用：安装与配置
+
+下面几步做完一次即可，之后日常只要在聊天里发指令或说人话即可。
+
+### 1. 先确认环境
+
+- 本机已安装并登录 **Codex CLI**（在终端执行 `codex --version` 能跑通）。
+- 已安装 **OpenClaw（龙虾机器人）**，并能执行 `openclaw` 命令。
 
 ### 2. 安装插件并启用
 
@@ -29,7 +34,7 @@ git clone git@github.com:sunsiyuan/openclaw-codex-cli-session.git
 cd openclaw-codex-cli-session
 ```
 
-用「本地链接」方式安装并启用（第二行是依赖，顺带启用即可）：
+用「本地链接」方式安装并启用（第二行是依赖，一起启用即可）：
 
 ```bash
 openclaw plugins install -l .
@@ -37,7 +42,7 @@ openclaw plugins enable codex-cli-session
 openclaw plugins enable acpx
 ```
 
-### 3. 让 OpenClaw 用本机 Codex
+### 3. 让龙虾机器人用你本机的 Codex
 
 ```bash
 openclaw config set acp.enabled true
@@ -52,23 +57,9 @@ openclaw restart
 
 ---
 
-## 你怎么操作：快捷指令与自然语言
+## 日常怎么用：聊天里就能搞定
 
-配置好后，**在 OpenClaw 的聊天里**（Telegram/Discord/IDE 等）可以这样用。
-
-### 关于 /codex：快捷方式是什么
-
-本插件提供了四个快捷指令（**发在聊天里会直接执行**，无需再复制命令）：
-
-- **`/codex`**：直接开一个 Codex 会话（默认持久多轮）。可带参数，例如 `/codex --mode oneshot` 开一次性会话。开会后在本 thread 继续聊即可。
-- **`/codex_status`**：快速看 codex-cli 后端是否配置、是否健康（仅查看，不执行会话操作）。
-- **`/codex_off`**：关闭当前 Codex 会话，但保留线程 ACP 绑定（后续仍可执行）。
-- **`/codex_danger`**：直接开一个带 `danger-full-access` sandbox 的 Codex 会话（适合 WSL2 等权限受限环境）。
-
-若需要更细控制（如 `--thread`、`--cwd`、`--label`），可以用原生 ACP 指令：
-
-- 持久多轮：`/acp spawn codex --mode persistent --thread off`
-- 一次性：`/acp spawn codex --mode oneshot --thread off`
+配置好后，在 **OpenClaw（龙虾机器人）的聊天里**（Telegram / Discord / IDE 等）可以这样用。
 
 ### 先确认真的在用 Codex
 
@@ -78,36 +69,34 @@ openclaw restart
 /acp doctor
 ```
 
-预期至少能看到：
+如果看到类似下面这些，就说明已经走本机 Codex，额度会扣在 Codex 上：
 
 - `configuredBackend: codex-cli`
 - `registeredBackend: codex-cli`
 - `healthy: yes`
 - `runtimeDoctor: ok (codex CLI available: ...)`
 
-看到这些就说明「用 Codex」的请求已经走本机 Codex，额度会扣在 Codex 上。
+### 开一个 Codex 会话（推荐方式）
 
-### 开一个 Codex 会话（快捷指令）
-
-**持久会话**（多轮同一会话，适合连续编程任务）：
+**最省事**：直接发快捷指令，默认就是持久多轮会话，在本 thread 继续聊即可：
 
 ```text
-/acp spawn codex --mode persistent --thread off
+/codex
 ```
 
-若当前频道支持「按 thread 绑定」（如 Telegram 话题、Discord 子频道）：
+需要一次性跑完就结束可以带参数：
 
 ```text
-/acp spawn codex --mode persistent --thread auto
+/codex --mode oneshot
 ```
 
-**一次性跑完就结束**：
+**想细调时**可以用原生 ACP 指令，例如：
 
-```text
-/acp spawn codex --mode oneshot --thread off
-```
+- 持久多轮：`/acp spawn codex --mode persistent --thread off`
+- 一次性：`/acp spawn codex --mode oneshot --thread off`
+- 当前频道支持「按 thread 绑定」时：`/acp spawn codex --mode persistent --thread auto`
 
-常用参数简要说明：
+常用参数：
 
 | 参数 | 含义 |
 |------|------|
@@ -119,9 +108,9 @@ openclaw restart
 | `--cwd /path` | 指定工作目录 |
 | `--label 名字` | 给会话起个标签，方便后面用 `/acp close 名字` 等 |
 
-### 自然语言也可以
+### 说人话也可以
 
-在 OpenClaw 里直接说人话，例如：
+在 OpenClaw（龙虾机器人）里直接说，例如：
 
 - 「用 Codex 做这件事」
 - 「在 thread 里开一个持久的 Codex 会话，专注在这个任务上」
@@ -129,16 +118,16 @@ openclaw restart
 
 配置好本插件并指向 codex-cli 后，这类请求会被路由到本机 Codex，消耗你的 Codex 额度。
 
-### 日常会用到的指令
+### 常用指令速查
 
-**本插件快捷指令（直接执行）：**
+**本插件快捷指令（发在聊天里直接执行）：**
 
 | 指令 | 作用 |
 |------|------|
 | `/codex` | 直接开 Codex 会话（默认持久；可带参数如 `--mode oneshot`） |
 | `/codex_status` | 查看后端是否在用 codex-cli、是否健康 |
 | `/codex_off` | 关闭当前 Codex 会话，但保留可执行状态 |
-| `/codex_danger` | 直接开带 danger-full-access 的 Codex 会话（如 WSL2） |
+| `/codex_danger` | 直接开带 danger-full-access 的 Codex 会话（如 WSL2 等权限受限环境） |
 
 **原生 ACP 指令（/acp 开头，可细调参数）：**
 
@@ -162,7 +151,7 @@ openclaw restart
 
 ### 小结：你实际在做什么
 
-1. **目标**：在 OpenClaw 里用 Codex 额度干活。
+1. **目标**：在 OpenClaw（龙虾机器人）里用 Codex 额度干活。
 2. **一次配置**：装插件 → 启用本插件和依赖 acpx → 设为用 codex-cli → 重启。
 3. **平时用**：在聊天里发 `/codex` 直接开 Codex 会话，或 `/acp spawn codex ...`、自然语言「用 Codex 做 xxx」。
 4. **确认**：`/acp doctor` 里看到在用 codex-cli 且 healthy。
@@ -172,9 +161,7 @@ openclaw restart
 
 ---
 
-## 故障排查
-
-遇到报错时可以先看这里：
+## 遇到问题时
 
 | 现象 | 可能原因 | 处理 |
 |------|----------|------|
@@ -212,6 +199,6 @@ openclaw restart
 
 ## English (short)
 
-**Goal:** Use your Codex subscription from OpenClaw—when you ask OpenClaw to use Codex or spawn a Codex session, it runs your local `codex` CLI and consumes your Codex quota.
+**Goal:** Use your Codex subscription from **OpenClaw (龙虾机器人 / Lobster Robot)**—when you ask OpenClaw to use Codex or spawn a Codex session, it runs your local `codex` CLI and consumes your Codex quota.
 
-**Quick setup:** Clone → `openclaw plugins install -l .` → enable `codex-cli-session` and `acpx` (dependency) → `openclaw config set acp.backend codex-cli` → `openclaw restart`. In chat: `/acp doctor` to verify, then `/acp spawn codex --mode persistent --thread off` (or use natural language like “run this in Codex”). Use `/acp status`, `/acp close`, `/acp cancel`, `/acp sessions` to manage sessions. See the Chinese section above for the full command list.
+**Quick setup:** Clone → `openclaw plugins install -l .` → enable `codex-cli-session` and `acpx` (dependency) → `openclaw config set acp.backend codex-cli` → `openclaw restart`. In chat: `/acp doctor` to verify, then `/codex` (or `/acp spawn codex --mode persistent --thread off`), or use natural language like “run this in Codex”. Use `/acp status`, `/acp close`, `/acp cancel`, `/acp sessions` to manage sessions. See the Chinese section above for the full command list.
