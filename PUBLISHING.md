@@ -1,5 +1,9 @@
 # Publishing Guide
 
+**当前状态**：npm 已发布 `codex-cli-session@0.1.0`；社区插件列表 PR 已提交 [openclaw/openclaw#42000](https://github.com/openclaw/openclaw/pull/42000)，待维护者合并。
+
+---
+
 ## 1) Publish this plugin to npm
 
 ```bash
