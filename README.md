@@ -2,6 +2,8 @@
 
 > **一句话**：在 **OpenClaw（龙虾机器人）** 里，用你自己的 **Codex 订阅额度** 来干活——在 Telegram、Discord 或 IDE 里和龙虾机器人对话时，说「用 Codex 做这件事」，请求就会走你本机的 `codex`，**扣的是你的 Codex 额度**，不占主模型额度。
 
+**相关链接**：[本仓库](https://github.com/sunsiyuan/openclaw-codex-cli-session) · [说明页（GitHub Pages）](https://sunsiyuan.github.io/openclaw-codex-cli-session/) · [OpenClaw 插件文档](https://docs.openclaw.ai/tools/plugin) · [社区插件列表](https://docs.openclaw.ai/plugins/community) · [ClawHub（技能库）](https://docs.openclaw.ai/tools/clawhub)
+
 ---
 
 ## 你能得到什么
@@ -190,10 +192,10 @@ openclaw restart
 
 仓库内已有 Pages 工作流与页面：
 
-- `.github/workflows/deploy-pages.yml`
-- `docs/index.html`
+- [`.github/workflows/deploy-pages.yml`](https://github.com/sunsiyuan/openclaw-codex-cli-session/blob/master/.github/workflows/deploy-pages.yml)
+- [`docs/index.html`](https://github.com/sunsiyuan/openclaw-codex-cli-session/blob/master/docs/index.html)
 
-在仓库设置中启用 Pages（Source = GitHub Actions），推送到默认分支后会自动部署。
+在仓库设置中启用 Pages（Source = GitHub Actions），推送到默认分支后会自动部署。**说明页地址**：[https://sunsiyuan.github.io/openclaw-codex-cli-session/](https://sunsiyuan.github.io/openclaw-codex-cli-session/)
 
 ---
 
